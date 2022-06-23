@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <%- include('basic-set')%>
+    <link href="/public/join.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="join">
+    <div>
+      <h2 class="info_Container">Join</h2><br>
+    </div>
+    <form method="POST" name="joinFrm" id="joinFrm">
+      <div id="joinFrm-container">
+
+        <div class="mb-3" id="name-container">
+          <label for="userName" class="form-label">NickName (한글 2글자 이상)</label>
+          <input type="text" class="form-control" id="userNickName" name="userNickName">
+        </div>
+        <div class="mb-3" id="id-container">
+          <label for="userId" class="form-label">ID (아이디 숫자 1글자 이상 포함 / 영소문자로 시작하는 4~12글자)</label>
+          <input type="text" class="form-control" id="userId" name="userId">
+        </div>
+        <div class="mb-3" id="pw-container">
+          <label for="userPw" class="form-label">Password (비밀번호 6자리 이상)</label>
+          <input type="password" class="form-control" id="userPw" name="userPw">
+        </div>
+        <div class="mb-3" id="pwCheck-container">
+          <label for="userPwCheck" class="form-label">PasswordCheck (비밀번호 6자리 이상)</label>
+          <input type="password" class="form-control" id="userPwCheck" name="userPwCheck">
+        </div>
+        <div id="btn-container">
+          <button type="submit" class="btn btn-primary" id="joinSubmit">회원가입</button>
+          <button type="button" class="btn btn-primary" onclick="location.href='login'">로그인</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.joinFrm.addEventListener('submit', (e) => {
+      const userNickNameVal = document.querySelector("#userNickName").value;
+      const userIdVal = document.querySelector("#userId").value;
+      const userPwVal = document.querySelector("#userPw").value;
+      const userPwCheckVal = document.querySelector("#userPwCheck").value;
+
+      const regExpNickName = /^[가-힣]{2,}$/; // 한글 2글자 이상만 허용
+      const regExpId1 = /^[a-z][a-z\d]{3,11}$/; // 영소문자로 시작하는 4 ~ 12 글자
+      const regExpId2 = /[0-9]/; // 아이디 숫자 하나 이상 포함
+      if (!userNickNameVal) {
+        alert("이름을 작성해주세요")
+        e.preventDefault();
+        return;
+      } else if (regExpNickName.test(userNickNameVal) == false) {
+        alert("올바른 이름 형식이 아닙니다 ! (한글 2글자 이상)")
+        e.preventDefault();
+        return;
+      } else if (!userIdVal) {
+        alert("아이디를 작성해주세요")
+        e.preventDefault();
+        return;
+      } else if (regExpId1.test(userIdVal) == false) {
+        alert("올바른 아이디 형식이 아닙니다 ! (영소문자로 시작하는 4~12글자)")
+        e.preventDefault();
+        return;
+      } else if (regExpId2.test(userIdVal) == false) {
+        alert("올바른 아이디 형식이 아닙니다 ! (아이디 숫자 1글자 이상 포함)")
+        e.preventDefault();
+        return;
+      } else if (!userPwVal) {
+        alert("비밀번호를 작성해주세요")
+        e.preventDefault();
+        return;
+      } else if (!userPwCheckVal) {
+        alert("비밀번호 확인을 작성해주세요")
+        e.preventDefault();
+        return;
+      } else if (userPwVal !== userPwCheckVal) {
+        alert("비밀번호가 일치하지 않습니다.");
+        e.preventDefault();
+        return;
+      } else if (userPwVal.length < '6') {
+        alert('비밀번호를 6자리 이상 입력해주세요 !')
+        e.preventDefault();
+        return;
+      } else {
+        alert("회원가입 성공 !");
+      }
+    });
+  </script>
+</body>
+
+</html>

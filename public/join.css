@@ -1,0 +1,44 @@
+.info_Container {
+  margin-top: 20px;
+  font-family: 'Jua', sans-serif;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+.mb-3 > label {
+  font-family: 'Jua', sans-serif;
+  font-size:20px;
+}
+#joinFrm-container {
+  vertical-align: middle;
+  position: relative;
+}
+#join {
+  width: 50%;
+  height: 400px;
+  margin: 0 auto;
+}
+#btn-container {
+  text-align: center;
+  align-items: center;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  border: 1px solid black;
+}
+th, td {
+  border: 1px solid black;
+  padding: 5px;
+}
+#btn-container > a > .btn {
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  width:20%;
+}
+#btn-container > .btn {
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  width:20%;
+}

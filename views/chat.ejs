@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <title>chat</title>
+  <%- include('basic-set')%>
+  <link href="/public/chat.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- 상단 nav -->
+  <div id="bar-container">
+    <div id="chat-btn-container">
+      <button type="button" class="btn btn-primary" id="createChatRoom">채팅방 생성</button>
+      <button type="button" class="btn btn-primary" id="searchChatRoom">채팅방 입장</button>
+    </div>
+  </div>
+
+  <div class="createChatRoom-modal-container">
+    <div class="createChatRoom-modal bg-dark">
+      <h4>채팅방 생성</h4>
+      <form action="/create_room" method="POST" onsubmit="return chat_check()">
+        <div class="my-3">
+          <input type="text" class="form-control" name="chatRoomName">
+        </div>
+        <button type="submit" class="btn btn-primary" id="create">생성</button>
+        <button type="button" class="btn btn-danger" id="create-close">닫기</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="searchChatRoom-modal-container">
+    <div class="searchChatRoom-modal bg-dark">
+      <h4>채팅방 입장</h4>
+      <div id="chatRoomList">
+        <ul style="list-style: none; padding-left: 0px;" id="ul_chatRoomList">
+          <% for(let i=0; i<chatrooms.length; i++ ) {%>
+            <li class="chatrooms_li" style="margin-bottom: 3px;" data-id="<%= chatrooms[i]._id%>">
+              <%= chatrooms[i].title%>
+            </li>
+            <% } %>
+        </ul>
+      </div>
+      <br>
+      <button type="button" class="btn btn-danger" id="search-close">닫기</button>
+    </div>
+  </div>
+
+  <script>
+    $('#createChatRoom').on('click', function () {
+      $('.createChatRoom-modal-container').addClass('create-show-modal');
+    });
+
+    $('#create-close').on('click', function () {
+      $('.createChatRoom-modal-container').removeClass('create-show-modal');
+      $('.form-control').val('');
+    });
+
+    $('#searchChatRoom').on('click', function () {
+      $('.searchChatRoom-modal-container').addClass('search-show-modal');
+    });
+
+    $('#search-close').on('click', function () {
+      $('.searchChatRoom-modal-container').removeClass('search-show-modal');
+    });
+
+    $('.chatrooms_title').on('click', function (e) {
+      $('#chatRoomNameSearch').val(this.dataset.id);
+    })
+
+    $('#conn').on('click', function (e) {
+      console.log(chatRoomNameSearch.value);
+    })
+
+  </script>
+
+  <div class="container p-4 detail">
+    <div class="row">
+      <div class="col-3">
+        <ul class="list-group chat-list" style="overflow: auto;">
+          <li>
+            <h6>채팅방 리스트</h6>
+          </li>
+          <% if (data.length==0) {%>
+            <li class="list-group-item">
+              <h6> 채팅방 없음 </h6>
+            </li>
+          <% } else { %>
+            <% for(let i=0; i < data.length; i++) {%>
+              <li style="word-break: option; word-wrap: break-word;" class="list-group-item" data-id="<%=data[i]._id%>">
+                <h6><%= data[i].title %></h6>
+                <h6 style="word-wrap: break-word; " class="text-small"><%= data[i].memberName%></h6>
+              </li>
+            <% } %>
+          <% } %>
+        </ul>
+      </div>
+
+      <div class="col-9 p-0" style="display: none;">
+        <div class="chat-room">
+          <ul class="list-group chat-content"></ul>
+          <div class="input-group">
+            <input class="form-control" id="chat-input" onkeyup="enterkey()">
+            <button class="btn btn-secondary" id="send">전송</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function enterkey() {
+      if (window.event.keyCode == 13) {
+        var tt = $('#chat-input').val().trim();
+        if (tt.trim() == '') {
+          alert('빈 값입니다!');
+        } else {
+          $('#send').click();
+        }
+      }
+    }
+    var click_chatroom_id;
+    var eventSource;
+
+    $('.list-group-item').click(function () {
+      click_chatroom_id = this.dataset.id; // 현재 클릭이벤트 동작하는 코드
+
+      $('.list-group-item').removeClass("active");
+      $(this).addClass("active");
+
+      $('.col-9.p-0').css("display", "block");
+      // 채팅 비우기
+      $('.chat-content').html('');
+
+      if (eventSource != undefined) {
+        eventSource.close();
+      }
+
+      // 실시간 소통 채널 입장완료
+      eventSource = new EventSource('/message/' + click_chatroom_id); // 유저 데이터 수신 ==> new EventSource('/경로')
+      eventSource.addEventListener('test', function (e) { // 이벤트 리스너
+
+        // 서버가 응답을 해줄때마다(데이터를 보낼때) 이벤트리스너 실행
+        //console.log(JSON.parse(e.data)) // 서버에서 보낸 데이터(json)를 parse 한다.
+
+        var get_message_data = JSON.parse(e.data);
+        get_message_data.forEach(function (i) { // 가져온 메시지 수 만큼 반복한다.
+
+          // i.userid와 현재 스토리지(세션? 쿠키?)에 들어있는 유저 아이디와 같다면 오른쪽 정렬
+          // 아니면 왼쪽 정렬
+          //if(i.userid )
+
+          if (i.userid == "<%= my_id%>") {
+            $('.chat-content').append('<div style="margin-bottom: 10px;"><h6 style="text-align:right; margin-bottom: 4px;">' + i.nick + '</h6><li style="margin-top: 4px;"><span style="background-color: yellow; float: right;"  class="chat-box">' + i.content + '</span></li></div>');
+          } else {
+            $('.chat-content').append('<div style="margin-bottom: 10px;"><h6 style="margin-bottom: 4px;">' + i.nick + '</h6><li style="margin-top: 4px;"><span class="chat-box">' + i.content + '</span></li><div>');
+          }
+          $('.chat-content').scrollTop($('.chat-content')[0].scrollHeight); // 상대방한테 메시지 받을때 스크롤 내리기
+        });
+
+      });
+
+    });
+
+    $('#send').click(function () {
+      var tt = $('#chat-input').val().trim();
+      if (tt == '') {
+        alert('빈 값입니다.');
+      } else {
+        var chat_data = $('#chat-input').val();
+        var send_data = {
+          parent: click_chatroom_id,
+          content: chat_data,
+        }
+
+        $.post('/message', send_data).then(() => {
+          console.log('전송 성공');
+          $('#chat-input').val('');
+          // 메시지 보내면 스크롤 내리기
+          $('.chat-content').stop().animate({ scrollTop: $('.chat-content')[0].scrollHeight });
+        });
+      }
+    });
+
+    $('.chatrooms_li').click(function () {
+      click_chatroom_id = this.dataset.id;
+
+      var chatrooms_data = {
+        chatrooms_data: click_chatroom_id, // 현재 클릭한 채팅룸의 _id(고유 _id)
+      }
+      $.post('/chatrooms_in', chatrooms_data).then(() => {
+        console.log("채팅룸 아이디 전송 성공!");
+        location.reload();
+        $('.searchChatRoom-modal-container').hide();
+      });
+    });
+
+    $('#searchChatRoom').click(function () {
+      $('.searchChatRoom-modal-container').show();
+    });
+
+
+    function chat_check() {
+      var chat_name = $('.form-control').val().trim();
+      if (chat_name == '') {
+        alert("제목을 입력해주세요");
+        $('.form-control').val('');
+        return false;
+      } else {
+        return true;
+      }
+    }
+  </script>
+</body>
+</html>

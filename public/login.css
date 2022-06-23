@@ -1,0 +1,34 @@
+#login {
+  width: 50%;
+  height: 400px;
+  margin: 0 auto;
+}
+.info-Container {
+  margin-top: 20px;
+  font-family: 'Jua', sans-serif;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+#loginFrm-container {
+  vertical-align: middle;
+  position: relative;
+}
+#id-container > label, #pw-container > label {
+  font-family: 'Jua', sans-serif;
+  font-size:20px;
+}
+#btn-container {
+  text-align: center;
+  align-items: center;
+}
+#btn-container > a > .btn {
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  width:20%;
+}
+#btn-container > .btn {
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  width:20%;
+}
